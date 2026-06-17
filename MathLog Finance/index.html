@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculadora Educacional</title>
+<style>
+
+    *{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
+
+body{
+background:#f4f4f4;
+display:flex;
+justify-content:center;
+align-items:center;
+min-height:100vh;
+padding:20px;
+}
+
+.container{
+background:white;
+width:550px;
+padding:25px;
+border-radius:15px;
+box-shadow:0 0 15px rgba(0,0,0,.2);
+}
+
+h1{
+text-align:center;
+margin-bottom:20px;
+}
+
+select,
+input,
+button,
+textarea{
+width:100%;
+padding:12px;
+margin-top:10px;
+}
+
+button{
+background:#007bff;
+color:white;
+border:none;
+border-radius:8px;
+cursor:pointer;
+}
+
+button:hover{
+background:#0056b3;
+}
+
+#resultado{
+margin-top:20px;
+padding:15px;
+background:#e8f5e9;
+border-radius:10px;
+font-size:18px;
+}
+
+#historico{
+margin-top:20px;
+}
+
+#historico ul{
+padding-left:20px;
+}
+
+.modal{
+display:none;
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,.5);
+}
+
+.modal-content{
+background:white;
+width:350px;
+padding:20px;
+margin:100px auto;
+border-radius:10px;
+}
+
+textarea{
+height:100px;
+}
+
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<h1>📚 Calculadora Educacional</h1>
+
+<select id="categoria">
+<option value="financeira">💰 Matemática Financeira</option>
+<option value="basica">📖 Matemática Básica</option>
+<option value="logistica">🚚 Logística</option>
+</select>
+
+<select id="operacao"></select>
+
+<div id="campos"></div>
+
+<button onclick="calcular()">Calcular</button>
+<button onclick="abrirSugestao()">Sugestões</button>
+
+<div id="resultado"></div>
+
+<div id="historico">
+<h3>Histórico</h3>
+<ul id="listaHistorico"></ul>
+</div>
+
+</div>
+
+<div class="modal" id="modal">
+<div class="modal-content">
+<h2>Sugestões</h2>
+
+<textarea id="sugestao" placeholder="Digite sua sugestão"></textarea>
+
+<button onclick="enviarSugestao()">Enviar</button>
+<button onclick="fecharSugestao()">Fechar</button>
+</div>
+</div>
+
+<script>
+
+    const categoria = document.getElementById("categoria");
+const operacao = document.getElementById("operacao");
+const campos = document.getElementById("campos");
+
+categoria.addEventListener("change", carregarOperacoes);
+operacao.addEventListener("change", atualizarCampos);
+
+carregarOperacoes();
+
+function carregarOperacoes(){
+
+operacao.innerHTML="";
+
+if(categoria.value==="financeira"){
+operacao.innerHTML=`
+<option value="jurosSimples">Juros Simples</option>
+<option value="jurosCompostos">Juros Compostos</option>
+<option value="desconto">Desconto</option>
+`;
+}
+
+if(categoria.value==="basica"){
+operacao.innerHTML=`
+<option value="porcentagem">Porcentagem</option>
+<option value="media">Média</option>
+<option value="regra3">Regra de Três</option>
+<option value="funcao1">Função do 1º Grau</option>
+<option value="funcao2">Função do 2º Grau</option>
+`;
+}
+
+if(categoria.value==="logistica"){
+operacao.innerHTML=`
+<option value="cubagem">Cubagem</option>
+<option value="combustivel">Consumo de Combustível</option>
+`;
+}
+
+atualizarCampos();
+}
+
+function atualizarCampos(){
+
+campos.innerHTML="";
+
+switch(operacao.value){
+
+case "jurosSimples":
+case "jurosCompostos":
+
+campos.innerHTML=`
+<input id="v1" placeholder="Capital">
+<input id="v2" placeholder="Taxa (%)">
+<input id="v3" placeholder="Tempo">
+`;
+break;
+
+case "desconto":
+
+campos.innerHTML=`
+<input id="v1" placeholder="Preço">
+<input id="v2" placeholder="Desconto (%)">
+`;
+break;
+
+case "porcentagem":
+
+campos.innerHTML=`
+<input id="v1" placeholder="Valor">
+<input id="v2" placeholder="Percentual (%)">
+`;
+break;
+
+case "media":
+
+campos.innerHTML=`
+<input id="v1" placeholder="Nota 1">
+<input id="v2" placeholder="Nota 2">
+<input id="v3" placeholder="Nota 3">
+`;
+break;
+
+case "regra3":
+
+campos.innerHTML=`
+<input id="v1" placeholder="A">
+<input id="v2" placeholder="B">
+<input id="v3" placeholder="C">
+`;
+break;
+
+case "funcao1":
+
+campos.innerHTML=`
+<input id="v1" placeholder="Coeficiente a">
+<input id="v2" placeholder="Coeficiente b">
+<input id="v3" placeholder="Valor de x">
+`;
+break;
+
+case "funcao2":
+
+campos.innerHTML=`
+<input id="v1" placeholder="Coeficiente a">
+<input id="v2" placeholder="Coeficiente b">
+<input id="v3" placeholder="Coeficiente c">
+`;
+break;
+
+case "cubagem":
+
+campos.innerHTML=`
+<input id="v1" placeholder="Comprimento">
+<input id="v2" placeholder="Largura">
+<input id="v3" placeholder="Altura">
+`;
+break;
+
+case "combustivel":
+
+campos.innerHTML=`
+<input id="v1" placeholder="Distância (km)">
+<input id="v2" placeholder="Litros">
+`;
+break;
+
+}
+}
+
+function calcular(){
+
+let resultado="";
+
+if(operacao.value==="jurosSimples"){
+
+let c=+v1.value;
+let i=+v2.value/100;
+let t=+v3.value;
+
+let montante=c+(c*i*t);
+
+resultado=`Montante: R$ ${montante.toFixed(2)}`;
+}
+
+if(operacao.value==="jurosCompostos"){
+
+let c=+v1.value;
+let i=+v2.value/100;
+let t=+v3.value;
+
+let montante=c*Math.pow(1+i,t);
+
+resultado=`Montante: R$ ${montante.toFixed(2)}`;
+}
+
+if(operacao.value==="desconto"){
+
+let preco=+v1.value;
+let desc=+v2.value;
+
+let final=preco-(preco*desc/100);
+
+resultado=`Preço Final: R$ ${final.toFixed(2)}`;
+}
+
+if(operacao.value==="porcentagem"){
+
+let valor=+v1.value;
+let perc=+v2.value;
+
+resultado=`Resultado: ${(valor*perc/100).toFixed(2)}`;
+}
+
+if(operacao.value==="media"){
+
+let n1=+v1.value;
+let n2=+v2.value;
+let n3=+v3.value;
+
+resultado=`Média: ${((n1+n2+n3)/3).toFixed(2)}`;
+}
+
+if(operacao.value==="regra3"){
+
+let a=+v1.value;
+let b=+v2.value;
+let c=+v3.value;
+
+resultado=`Resultado: ${((b*c)/a).toFixed(2)}`;
+}
+
+if(operacao.value==="funcao1"){
+
+let a=+v1.value;
+let b=+v2.value;
+let x=+v3.value;
+
+resultado=`f(${x}) = ${(a*x+b).toFixed(2)}`;
+}
+
+if(operacao.value==="funcao2"){
+
+let a=+v1.value;
+let b=+v2.value;
+let c=+v3.value;
+
+let delta=(b*b)-(4*a*c);
+
+if(delta<0){
+resultado=`Δ = ${delta}<br>Não existem raízes reais`;
+}else{
+
+let x1=(-b+Math.sqrt(delta))/(2*a);
+let x2=(-b-Math.sqrt(delta))/(2*a);
+
+resultado=`
+Δ = ${delta}<br>
+x₁ = ${x1.toFixed(2)}<br>
+x₂ = ${x2.toFixed(2)}
+`;
+}
+}
+
+if(operacao.value==="cubagem"){
+
+let comp=+v1.value;
+let larg=+v2.value;
+let alt=+v3.value;
+
+resultado=`Volume: ${(comp*larg*alt).toFixed(2)} m³`;
+}
+
+if(operacao.value==="combustivel"){
+
+let km=+v1.value;
+let litros=+v2.value;
+
+resultado=`Consumo: ${(km/litros).toFixed(2)} km/l`;
+}
+
+document.getElementById("resultado").innerHTML=resultado;
+
+let li=document.createElement("li");
+li.innerHTML=resultado;
+
+document.getElementById("listaHistorico").appendChild(li);
+}
+
+function abrirSugestao(){
+document.getElementById("modal").style.display="block";
+}
+
+function fecharSugestao(){
+document.getElementById("modal").style.display="none";
+}
+
+function enviarSugestao(){
+
+let texto=document.getElementById("sugestao").value;
+
+if(texto.trim()===""){
+alert("Digite uma sugestão.");
+return;
+}
+
+alert("Sugestão enviada com sucesso!");
+
+document.getElementById("sugestao").value="";
+
+fecharSugestao();
+}
+
+
+</script>
+
+</body>
+</html>
